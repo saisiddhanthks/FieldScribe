@@ -1,0 +1,23 @@
+{
+  "name": "FieldScribe · EMS clinical record",
+  "short_name": "FieldScribe",
+  "description": "Offline voice-to-structured clinical record for 108 ambulance crews",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "categories": ["medical", "productivity"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "New incident", "url": "/capture" },
+    { "name": "Copilot", "url": "/copilot" },
+    { "name": "ED handover", "url": "/handover" }
+  ]
+}

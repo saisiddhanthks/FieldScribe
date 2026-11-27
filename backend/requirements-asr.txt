@@ -1,0 +1,3 @@
+# Offline speech recognition (optional but recommended)
+faster-whisper>=1.0.3
+av>=14

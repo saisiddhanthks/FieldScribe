@@ -1,0 +1,16 @@
+node_modules/
+__pycache__/
+.pytest_cache/
+.venv/
+backend/data/*
+!backend/data/.gitkeep
+backend/models/
+*.db
+.env
+backend/maps/
+
+# local build and editor files
+*.zip
+frontend/tsconfig.tsbuildinfo
+*.log
+backend/data/certs/

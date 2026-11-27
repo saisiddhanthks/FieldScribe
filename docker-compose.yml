@@ -1,0 +1,50 @@
+# One command runs the ambulance device app and the ED / state hub database:
+#   docker compose up --build        then open http://localhost:8000
+# Optional cloud Copilot: put GEMINI_API_KEY=... in a file named .env next to this one.
+services:
+  hub-db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fieldscribe_hub
+      POSTGRES_USER: fieldscribe
+      POSTGRES_PASSWORD: ${HUB_DB_PASSWORD:-change-me-hub}
+    volumes:
+      - hub-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fieldscribe -d fieldscribe_hub"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  fieldscribe:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      hub-db:
+        condition: service_healthy
+    ports: ["8000:8000"]
+    environment:
+      FIELDSCRIBE_ASR_MODEL: ${FIELDSCRIBE_ASR_MODEL:-small}
+      FIELDSCRIBE_HUB_URL: postgresql://fieldscribe:${HUB_DB_PASSWORD:-change-me-hub}@hub-db:5432/fieldscribe_hub
+      FIELDSCRIBE_ENV: /data/.env
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434/v1}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - fieldscribe-data:/data                       # encrypted device DB, its key and the audit ledger
+      - whisper-cache:/root/.cache/huggingface       # speech model, downloaded once
+      - ./backend/maps:/app/backend/maps             # offline street map (run fetch_map.py first)
+      - ./backend/models:/app/backend/models         # trained DistilBERT and Whisper models if present
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  hub-data:
+  fieldscribe-data:
+  whisper-cache:
